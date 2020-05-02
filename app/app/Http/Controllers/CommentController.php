@@ -14,7 +14,7 @@ class CommentController extends Controller
      */
     public function index()
     {
-        //
+        return Comment::allRootCommentsWithChildren();
     }
 
     /**
@@ -25,18 +25,16 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'content' => 'required',
+        ]);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Comment $comment)
-    {
-        //
+        $comment = new Comment();
+        $comment->content = $request->content;
+        $comment->parent_id = $request->parent_id;
+        $comment->save();
+
+        return response($comment->jsonSerialize(), 201);
     }
 
     /**
@@ -48,7 +46,13 @@ class CommentController extends Controller
      */
     public function update(Request $request, Comment $comment)
     {
-        //
+        $request->validate([
+            'content' => 'required|string',
+        ]);
+        $comment->content = $request->content;
+        $comment->save();
+
+        return response($comment->jsonSerialize(), 200);
     }
 
     /**
@@ -59,6 +63,8 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        //
+
+        $comment->delete();
+        return response(null, 204);
     }
 }
